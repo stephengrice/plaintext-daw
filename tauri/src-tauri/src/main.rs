@@ -55,6 +55,16 @@ fn open_project(handle: tauri::AppHandle, app_state: State<AppState>) {
 }
 
 #[tauri::command]
+fn record(handle: tauri::AppHandle, app_state: State<AppState>) {
+    println!("Started recording");
+}
+
+#[tauri::command]
+fn stop_record(handle: tauri::AppHandle, app_state: State<AppState>) {
+    println!("Stopped recording");
+}
+
+#[tauri::command]
 fn play_sound(handle: tauri::AppHandle, app_state: State<AppState>) {
     println!("Playing sound");
     // Open the WAV file
@@ -74,7 +84,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             new_project,
             open_project, 
-            play_sound
+            record, 
+            stop_record, 
+            play_sound,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
