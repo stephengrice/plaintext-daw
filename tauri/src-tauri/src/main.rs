@@ -69,7 +69,7 @@ fn record(handle: tauri::AppHandle, app_state: State<AppState>) {
 
     // Get the format of the input device
     let stream_config = device.default_input_config().unwrap();
-    let sample_rate = stream_config.sample_rate().0;
+    let sample_rate = stream_config.sample_rate().0 * 2; // TODO figure out why it plays back at half speed??
 
     // Create a shared buffer to store the recorded audio samples
     let buffer = Arc::new(Mutex::new(Vec::<f32>::new()));
