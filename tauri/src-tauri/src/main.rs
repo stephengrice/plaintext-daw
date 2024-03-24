@@ -12,6 +12,10 @@ use std::fs::File;
 use std::io::BufReader;
 use rodio::{Decoder, OutputStream, source::Source};
 
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use hound::WavWriter;
+use std::thread;
+
 mod state;
 
 struct AppState(Arc<Mutex<state::App>>);
@@ -57,6 +61,65 @@ fn open_project(handle: tauri::AppHandle, app_state: State<AppState>) {
 #[tauri::command]
 fn record(handle: tauri::AppHandle, app_state: State<AppState>) {
     println!("Started recording");
+    // Initialize the default host and get the default input device
+    let host = cpal::default_host();
+    let device = host
+        .default_input_device()
+        .expect("Failed to get default input device");
+
+    // Get the format of the input device
+    let stream_config = device.default_input_config().unwrap();
+    let sample_rate = stream_config.sample_rate().0;
+
+    // Create a shared buffer to store the recorded audio samples
+    let buffer = Arc::new(Mutex::new(Vec::<f32>::new()));
+
+    // Clone the buffer for use in the audio stream callback
+    let buffer_clone = buffer.clone();
+
+    // Define the callback that will be called with recorded audio samples
+    let callback = move |data: &[f32], _: &cpal::InputCallbackInfo| {
+        let mut buffer = buffer_clone.lock().unwrap();
+        buffer.extend_from_slice(data);
+    };
+
+    // Create an audio stream with the specified device, format, and callback
+    let stream = device
+        .build_input_stream(&stream_config.into(), callback, |err| eprintln!("Error: {}", err), None)
+        .expect("Failed to build input stream");
+
+    // Start the audio stream
+    stream
+        .play()
+        .expect("Failed to start input stream");
+
+    println!("Recording audio...");
+
+    // Keep the main thread alive while the audio stream is active
+    std::thread::sleep(std::time::Duration::from_secs(2));
+
+    // Once recording is complete, save the recorded audio buffer to a WAV file
+    println!("Recording finished, saving to WAV file...");
+
+    let buffer = buffer.lock().unwrap();
+    save_wav_file("recorded_audio.wav", &buffer, sample_rate).expect("Failed to save WAV file");
+}
+fn save_wav_file(filename: &str, samples: &[f32], sample_rate: u32) -> Result<(), hound::Error> {
+    let spec = hound::WavSpec {
+        channels: 1,
+        sample_rate: sample_rate,
+        bits_per_sample: 32,
+        sample_format: hound::SampleFormat::Float,
+    };
+
+    let mut writer = hound::WavWriter::create(filename, spec)?;
+
+    for &sample in samples {
+        writer.write_sample(sample)?;
+    }
+
+    writer.finalize()?;
+    Ok(())
 }
 
 #[tauri::command]
