@@ -11,7 +11,6 @@ use tauri::{Manager, State};
 use std::fs::File;
 use std::io::BufReader;
 use rodio::{Decoder, OutputStream, source::Source};
-use std::env;
 
 mod state;
 
@@ -26,6 +25,11 @@ fn render_song(path: String) {
 }
 
 #[tauri::command]
+fn new_project(handle: tauri::AppHandle, app_state: State<AppState>) {
+    println!("New project clicked.");
+}
+
+    #[tauri::command]
 fn open_project(handle: tauri::AppHandle, app_state: State<AppState>) {
     let app_state = app_state.0.clone();
     dialog::FileDialogBuilder::new()
@@ -53,11 +57,6 @@ fn open_project(handle: tauri::AppHandle, app_state: State<AppState>) {
 #[tauri::command]
 fn play_sound(handle: tauri::AppHandle, app_state: State<AppState>) {
     println!("Playing sound");
-    if let Ok(current_dir) = env::current_dir() {
-        println!("Current working directory: {}", current_dir.display());
-    } else {
-        eprintln!("Failed to get current working directory");
-    }
     // Open the WAV file
     let file = File::open("../../python/test/data/song1/piano/Piano-C5.ogg.wav").expect("Failed to open file");
     let source = Decoder::new(BufReader::new(file)).expect("Failed to decode WAV");
@@ -65,22 +64,15 @@ fn play_sound(handle: tauri::AppHandle, app_state: State<AppState>) {
     // Start the audio playback
     let (stream, stream_handle) = OutputStream::try_default().unwrap();
     stream_handle.play_raw(source.convert_samples());
-    std::thread::sleep(std::time::Duration::from_secs(5));
+    std::thread::sleep(std::time::Duration::from_secs(2));
     println!("Done sound playing handler");
-}
-
-#[tauri::command]
-fn get_app(handle: tauri::AppHandle, filepath: State<AppState>) -> state::App {
-    let fpath = filepath.0.lock().unwrap();
-    let result = (*fpath).clone();
-    result
 }
 
 fn main() {
     tauri::Builder::default()
         .manage(AppState(Default::default()))
         .invoke_handler(tauri::generate_handler![
-            get_app, 
+            new_project,
             open_project, 
             play_sound
         ])
