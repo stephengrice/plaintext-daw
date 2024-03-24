@@ -1,12 +1,17 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import { Button, Title } from "@mantine/core";
 
-const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   return (
     <>
-      <div>Hello from Next.js</div>
+      <Title className='text-center pt-2'>Plaintext DAW</Title>
+      <div className='py-8 text-center'>
+        Let's make some music.
+      </div>
+      <div className='flex w-full justify-around'>
+        <Button variant='outline' color='red'>New</Button>
+        <Button variant='outline'>Open</Button>
+      </div>
     </>
   )
 }
