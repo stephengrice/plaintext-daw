@@ -31,6 +31,17 @@ fn render_song(path: String) {
 #[tauri::command]
 fn new_project(handle: tauri::AppHandle, app_state: State<AppState>) {
     println!("New project clicked.");
+    // Spawn a new thread
+    std::thread::spawn(|| {
+        // Code to be executed in the new thread
+        let mut counter = 0;
+        while counter < 2 {
+            println!("Hello from the new thread! {}", counter);
+            std::thread::sleep(std::time::Duration::from_secs(1));
+            counter += 1;
+        }
+        println!("Done looping in new thread.");
+    });
 }
 
     #[tauri::command]
