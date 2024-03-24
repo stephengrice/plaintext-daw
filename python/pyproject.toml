@@ -1,0 +1,22 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "plaintext-daw"
+version = "0.0.0"
+description = "Plaintext DAW"
+authors = ["Steve G. <pagekeysolutions@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+numpy = "*"
+pyyaml = "*"
+pydub = "*"
+
+[tool.poetry.dev-dependencies]
+pytest = "^8.0.0"
+pytest-cov = "^4.1.0"
+
+[tool.poetry.scripts]
+pagekey-sitegen = "plaintext_daw.cli:cli_entry_point"
