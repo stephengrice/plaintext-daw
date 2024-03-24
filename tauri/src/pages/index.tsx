@@ -12,6 +12,9 @@ export default function Home() {
   const handleOpen = async () => {
     await invoke('open_project', {});
   };
+  const handlePlay = async () => {
+    await invoke('play_sound', {});
+  }
 
   return (
     <>
@@ -22,6 +25,7 @@ export default function Home() {
       <div className='flex w-full justify-around'>
         <Button variant='outline' color='red' onClick={() => handleNew()}>New</Button>
         <Button variant='outline' onClick={() => handleOpen()}>Open</Button>
+        <Button variant='outline' color='green' onClick={handlePlay}>Play sound</Button>
       </div>
     </>
   )

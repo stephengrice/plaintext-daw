@@ -8,6 +8,11 @@ use std::sync::{Arc, Mutex};
 use tauri::api::dialog;
 use tauri::{Manager, State};
 
+use std::fs::File;
+use std::io::BufReader;
+use rodio::{Decoder, OutputStream, source::Source};
+use std::env;
+
 mod state;
 
 struct AppState(Arc<Mutex<state::App>>);
@@ -46,6 +51,25 @@ fn open_project(handle: tauri::AppHandle, app_state: State<AppState>) {
 }
 
 #[tauri::command]
+fn play_sound(handle: tauri::AppHandle, app_state: State<AppState>) {
+    println!("Playing sound");
+    if let Ok(current_dir) = env::current_dir() {
+        println!("Current working directory: {}", current_dir.display());
+    } else {
+        eprintln!("Failed to get current working directory");
+    }
+    // Open the WAV file
+    let file = File::open("../../python/test/data/song1/piano/Piano-C5.ogg.wav").expect("Failed to open file");
+    let source = Decoder::new(BufReader::new(file)).expect("Failed to decode WAV");
+
+    // Start the audio playback
+    let (stream, stream_handle) = OutputStream::try_default().unwrap();
+    stream_handle.play_raw(source.convert_samples());
+    std::thread::sleep(std::time::Duration::from_secs(5));
+    println!("Done sound playing handler");
+}
+
+#[tauri::command]
 fn get_app(handle: tauri::AppHandle, filepath: State<AppState>) -> state::App {
     let fpath = filepath.0.lock().unwrap();
     let result = (*fpath).clone();
@@ -55,7 +79,11 @@ fn get_app(handle: tauri::AppHandle, filepath: State<AppState>) -> state::App {
 fn main() {
     tauri::Builder::default()
         .manage(AppState(Default::default()))
-        .invoke_handler(tauri::generate_handler![get_app, open_project,])
+        .invoke_handler(tauri::generate_handler![
+            get_app, 
+            open_project, 
+            play_sound
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
