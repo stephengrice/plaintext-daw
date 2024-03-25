@@ -74,9 +74,27 @@ fn record(handle: tauri::AppHandle, app_state: State<AppState>) {
     println!("Started recording");
     // Initialize the default host and get the default input device
     let host = cpal::default_host();
-    let device = host
-        .default_input_device()
-        .expect("Failed to get default input device");
+    
+    // Get the list of available input devices
+    let input_devices = host.input_devices().unwrap();
+    
+    println!("Available input devices:");
+    for (index, device) in input_devices.enumerate() {
+        println!("{}: {}", index, device.name().unwrap());
+    }
+    let device: cpal::Device = host.input_devices().unwrap().nth(16).unwrap();
+    // let device = input_devices.nth(16).unwrap();
+    // let device = host
+    //     .default_input_device()
+    //     .expect("Failed to get default input device");
+    
+    // Get the list of available output devices
+    // let output_devices = host.output_devices().unwrap();
+
+    // println!("Available output devices:");
+    // for (index, device) in output_devices.enumerate() {
+    //     println!("{}: {}", index, device.name().unwrap());
+    // }
 
     // Get the format of the input device
     let stream_config = device.default_input_config().unwrap();
@@ -107,7 +125,7 @@ fn record(handle: tauri::AppHandle, app_state: State<AppState>) {
     println!("Recording audio...");
 
     // Keep the main thread alive while the audio stream is active
-    std::thread::sleep(std::time::Duration::from_secs(2));
+    std::thread::sleep(std::time::Duration::from_secs(5));
 
     // Once recording is complete, save the recorded audio buffer to a WAV file
     println!("Recording finished, saving to WAV file...");
