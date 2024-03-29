@@ -33,8 +33,9 @@ fn main() {
         .manage(AppState(Default::default()))
         .invoke_handler(tauri::generate_handler![
             home::new_project,
-            home::open_project, 
-            project::record, 
+            home::open_project,
+            project::get_devices, 
+            project::record,
             project::stop_record, 
             project::play_sound,
         ])

@@ -16,6 +16,23 @@ use crate::state::AppState;
 
 
 #[tauri::command]
+pub fn get_devices(handle: tauri::AppHandle, app_state: State<AppState>) -> Vec<String> {
+    // Initialize the default host and get the default input device
+    let host = cpal::default_host();
+
+    // Get the list of available input devices
+    let input_devices = host.input_devices().unwrap();
+    
+    let mut devices_list: Vec<String> = Vec::new();
+
+    for (index, device) in input_devices.enumerate() {
+        devices_list.push(device.name().unwrap().to_string());
+    }
+
+    devices_list
+}
+
+#[tauri::command]
 pub fn record(handle: tauri::AppHandle, app_state: State<AppState>) {
     println!("Started recording");
     // Initialize the default host and get the default input device
