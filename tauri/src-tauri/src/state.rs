@@ -1,5 +1,8 @@
 use serde::Deserialize;
 use serde::Serialize;
+use std::sync::{Arc, Mutex};
+
+pub struct AppState(pub Arc<Mutex<App>>);
 
 #[derive(Clone, Default, Serialize)]
 pub struct App {
