@@ -122,13 +122,16 @@ pub fn stop_record(handle: tauri::AppHandle, app_state: State<AppState>) {
 #[tauri::command]
 pub fn play_sound(handle: tauri::AppHandle, app_state: State<AppState>) {
     println!("Playing sound");
-    // Open the WAV file
-    let file = File::open("../../python/test/data/song1/piano/Piano-C5.ogg.wav").expect("Failed to open file");
-    let source = Decoder::new(BufReader::new(file)).expect("Failed to decode WAV");
-
-    // Start the audio playback
-    let (stream, stream_handle) = OutputStream::try_default().unwrap();
-    stream_handle.play_raw(source.convert_samples());
-    std::thread::sleep(std::time::Duration::from_secs(2));
-    println!("Done sound playing handler");
+    // Spawn a new thread
+    std::thread::spawn(|| {
+        // Open the WAV file
+        let file = File::open("../../python/test/data/song1/piano/Piano-C5.ogg.wav").expect("Failed to open file");
+        let source = Decoder::new(BufReader::new(file)).expect("Failed to decode WAV");
+    
+        // Start the audio playback
+        let (stream, stream_handle) = OutputStream::try_default().unwrap();
+        stream_handle.play_raw(source.convert_samples());
+        std::thread::sleep(std::time::Duration::from_secs(2));
+        println!("Done playing sound.");
+    });
 }

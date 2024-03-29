@@ -16,19 +16,6 @@ use crate::state::AppState;
 
 #[tauri::command]
 pub fn new_project(handle: tauri::AppHandle, app_state: State<AppState>) {
-    println!("New project clicked.");
-    // Spawn a new thread
-    std::thread::spawn(|| {
-        // Code to be executed in the new thread
-        let mut counter = 0;
-        while counter < 2 {
-            println!("Hello from the new thread! {}", counter);
-            std::thread::sleep(std::time::Duration::from_secs(1));
-            counter += 1;
-        }
-        println!("Done looping in new thread.");
-    });
-
     let app_state = app_state.0.clone();
     dialog::FileDialogBuilder::new()
         .add_filter("PTD Project (*.ptd)", &["ptd"])
