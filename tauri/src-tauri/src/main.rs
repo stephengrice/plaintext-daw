@@ -42,13 +42,39 @@ fn new_project(handle: tauri::AppHandle, app_state: State<AppState>) {
         }
         println!("Done looping in new thread.");
     });
+
+    let app_state = app_state.0.clone();
+    dialog::FileDialogBuilder::new()
+        .add_filter("PTD Project (*.ptd)", &["ptd"])
+        .set_file_name("project.ptd")
+        .save_file(move |file_path| {
+            if let Some(path) = file_path {
+                // Touch the project file
+                let mut file = File::create(path.to_str().unwrap().to_string());
+                // Open project window
+                app_state.lock().unwrap().filepath = path.to_str().unwrap().to_string();
+                tauri::WindowBuilder::new(
+                    &handle,
+                    "editor",
+                    tauri::WindowUrl::App("index2.html".into()),
+                )
+                .title("Plaintext DAW Editor")
+                .build()
+                .unwrap();
+                handle
+                    .get_window("open-project")
+                    .unwrap()
+                    .close()
+                    .expect("Unable to close window");
+            }
+    });
 }
 
     #[tauri::command]
 fn open_project(handle: tauri::AppHandle, app_state: State<AppState>) {
     let app_state = app_state.0.clone();
     dialog::FileDialogBuilder::new()
-        .add_filter("Yaml", &["yml", "yaml"])
+        .add_filter("PTD Project (*.ptd)", &["ptd"])
         .pick_file(move |file_path| {
             if let Some(path) = file_path {
                 app_state.lock().unwrap().filepath = path.to_str().unwrap().to_string();
