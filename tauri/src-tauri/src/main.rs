@@ -56,7 +56,7 @@ fn new_project(handle: tauri::AppHandle, app_state: State<AppState>) {
                 tauri::WindowBuilder::new(
                     &handle,
                     "editor",
-                    tauri::WindowUrl::App("index2.html".into()),
+                    tauri::WindowUrl::App("/project".into()),
                 )
                 .title("Plaintext DAW Editor")
                 .build()
@@ -81,7 +81,7 @@ fn open_project(handle: tauri::AppHandle, app_state: State<AppState>) {
                 tauri::WindowBuilder::new(
                     &handle,
                     "editor",
-                    tauri::WindowUrl::App("index2.html".into()),
+                    tauri::WindowUrl::App("/project".into()),
                 )
                 .title("Plaintext DAW Editor")
                 .build()
