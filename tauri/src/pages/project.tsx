@@ -5,17 +5,20 @@ import { useEffect, useState } from "react";
 
 export default function ProjectView() {
     const [devices, setDevices] = useState<string[]>([]);
+    const [device, setDevice] = useState<string>('');
     const [recording, setRecording] = useState<boolean>(false);
 
     useEffect(() => {
         invoke('get_devices', {}).then((resp) => {
-            setDevices(resp as string[]);
+            const respTyped = resp as string[];
+            setDevices(respTyped);
+            setDevice(respTyped[0]);
         });
     }, []);
 
     const handleRecord = async () => {
         setRecording(true);
-        await invoke('record', {});
+        await invoke('record', { deviceName: device });
     };
     const handleStopRecord = async () => {
         setRecording(false);
@@ -39,6 +42,8 @@ export default function ProjectView() {
                 <Select
                     label="Input Devices"
                     data={devices}
+                    value={device}
+                    onChange={(value, option) => setDevice(option.value)}
                 />
             </div>
         </>

@@ -1,15 +1,7 @@
-use std::process::Command;
-use std::sync::{Arc, Mutex};
 use tauri::api::dialog;
 use tauri::{Manager, State};
 
 use std::fs::File;
-use std::io::BufReader;
-use rodio::{Decoder, OutputStream, source::Source};
-
-use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
-use hound::WavWriter;
-use std::thread;
 
 use crate::state::AppState;
 
